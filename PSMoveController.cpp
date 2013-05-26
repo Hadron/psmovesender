@@ -5,6 +5,7 @@
 #include <opencv2/highgui/highgui_c.h>
 
 #include <stdio.h>
+#include <poll.h>
 
 #include <libPlasma/c++/Slaw.h>
 #include <libPlasma/c++/Protein.h>
@@ -131,6 +132,22 @@ void PSMoveController::Process ()
     m_imgd = (m_imgw / 2.) / tan (xfov);
   }
 
+  {
+    /* If you're gonna go ugly, may as well go big. */
+
+    struct pollfd fds;
+    int fd = *((int *) *(((void **) (move)) + 1));
+
+    fds.fd = fd;
+    fds.events = POLLIN;
+    fds.revents = 0;
+    int ret = poll (&fds, 1, 1000000);
+    if (ret == -1 || ret == 0)
+      return;
+    if (fds.revents & (POLLERR | POLLHUP | POLLNVAL))
+      return;
+  }
+
   while (psmove_poll (move)) {
 
     m_nframes++;
@@ -138,6 +155,11 @@ void PSMoveController::Process ()
     if (psmove_get_buttons (move) & Btn_MOVE) {
 
       psmove_reset_orientation (move);
+
+      /* The negative one in the z-axis is because this whole section
+	 of code actually broken, and I probably need to do some kind
+	 of T Q T^(-1) shenanigans.  But it'll do until I take a more
+	 thorough look. */
 
       /* 'from', in model space, is the vector we want to transform to
 	 'to' in worldspace. */
