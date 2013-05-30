@@ -22,11 +22,12 @@ static inline Quat psmove_get_orientation_q (PSMove *move, Quat &q)
     q.NormSelf ();
 }
 
-PSMoveController::PSMoveController (PSMove *m)
+PSMoveController::PSMoveController (PSMove *m, int id)
 {
   move = m;
   m_tracker = NULL;
   m_fusion = NULL;
+  m_id = id;
 
   m_calibrated = false;
 
@@ -199,7 +200,7 @@ void PSMoveController::Process ()
   Slaw m = Slaw::Map ();
   m = m.MapPut ("loc", m_wpos);
 
-  m = m.MapPut ("name", "wand-1");
+  m = m.MapPut ("name", Str ().Format ("wand-%d", m_id));
   m = m.MapPut ("info-aim", wq.QuatRotVect (Vect (0., 0., 1.)).Norm ());
   m = m.MapPut ("norm", wq.QuatRotVect (Vect (0., 1., 0.)).Norm ());
   m = m.MapPut ("over", wq.QuatRotVect (Vect (1., 0., 0.)).Norm ());
@@ -262,7 +263,7 @@ void PSMoveController::Process ()
     }
   }
 
-  m = m.MapPut ("bitflag", Slaw (buttons.Count () > 0? 1 : 0));
+  m = m.MapPut ("bitflag", Slaw (buttons.Count () > 0 ? 1 : 0));
 
   struct timespec ts;
   clock_gettime (CLOCK_REALTIME, &ts);

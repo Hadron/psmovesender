@@ -1,4 +1,16 @@
+#include <wchar.h>
+
 #include "PSMoveManager.h"
+
+#include "psmove_private.h"
+#include "hidapi.h"
+
+struct MoveRecord 
+{
+  PSMove *move;
+  bool flag;
+  int id;
+};
 
 PSMoveManager::PSMoveManager ()
 {
@@ -8,6 +20,18 @@ PSMoveManager::PSMoveManager ()
 
 void PSMoveManager::ConnectAll ()
 {
+  struct hid_device_info *devs, *cur;
+  devs = hid_enumerate (PSMOVE_VID, PSMOVE_PID);
+
+  for (cur = devs; cur != NULL; cur = cur->next) {
+    /* Only consider Bluetooth devices. */
+    if ((cur->serial_number == NULL) || (wcslen (cur->serial_number) == 0)) {
+      continue;
+    }
+    printf ("%ls %s\n", cur->serial_number, cur->path);
+  }
+
+#if 0
   int num = psmove_count_connected ();
   for (int i = 0; i < num; i++) {
 
@@ -25,7 +49,7 @@ void PSMoveManager::ConnectAll ()
       abort ();
     }
 
-    m_move = new PSMoveController (move);
+    m_move = new PSMoveController (move, i);
 
     Vect v (0., 1000., -700.);
     Quat q = Quat::QRotFromNormOver (Vect (0., 0., 1.), Vect (1., 0., 0.));
@@ -35,6 +59,7 @@ void PSMoveManager::ConnectAll ()
 
     m_move->SetZeroPoint (v);
   }
+#endif
 }
 
 void PSMoveManager::Loop ()

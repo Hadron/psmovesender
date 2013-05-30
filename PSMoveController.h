@@ -25,6 +25,7 @@ class PSMoveController
   PSMove *move;
   PSMoveTracker *m_tracker;
   PSMoveFusion *m_fusion;
+  int m_id;
 
   bool m_calibrated;
 
@@ -74,7 +75,7 @@ class PSMoveController
 
  public:
 
-  PSMoveController (PSMove *m);
+  PSMoveController (PSMove *m, int id);
 
   virtual void SetCamera (Vect v, Quat q);
   virtual void SetZeroPoint (Vect v);
