@@ -15,4 +15,6 @@ int main (int argc, char *argv[])
   manager.ConnectAll ();
 
   manager.Loop ();
+
+  return EXIT_SUCCESS;
 }

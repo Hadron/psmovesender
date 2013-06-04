@@ -54,13 +54,6 @@ PSMoveController::PSMoveController (PSMove *m, int id)
   m_nframes = 0;
   m_lastframe = 0;
 
-  oblong::loam::ObRetort ret;
-  m_hose = Pool::Participate ("wands", Pool::MMAP_MEDIUM, &ret);
-  if (ret.IsError ()) {
-    fprintf (stderr, "Could not connect to controller.\n");
-    abort ();
-  }    
-
   if (move == NULL) {
     abort ();
   }
@@ -105,6 +98,13 @@ void PSMoveController::UpdatePosition ()
   m_wpos = m_cpos + m_corient.QuatRotVect (unit * m_wdistance);
 }
 
+int PSMoveController::FileHandle ()
+{
+  /* If you're gonna go ugly, may as well go big. */
+  int fd = *((int *) *(((void **) (move)) + 1));
+  return fd;
+}
+
 void PSMoveController::Process ()
 {
   if (!m_postrack && !m_poslock) {
@@ -131,22 +131,6 @@ void PSMoveController::Process ()
     float xfov = PSEYE_FOV_BLUE_DOT * M_PI / 360.;
     /* tan[xfov] = opposite (m_imgw / 2.) / adjacent (m_imgd) */
     m_imgd = (m_imgw / 2.) / tan (xfov);
-  }
-
-  {
-    /* If you're gonna go ugly, may as well go big. */
-
-    struct pollfd fds;
-    int fd = *((int *) *(((void **) (move)) + 1));
-
-    fds.fd = fd;
-    fds.events = POLLIN;
-    fds.revents = 0;
-    int ret = poll (&fds, 1, 1000000);
-    if (ret == -1 || ret == 0)
-      return;
-    if (fds.revents & (POLLERR | POLLHUP | POLLNVAL))
-      return;
   }
 
   while (psmove_poll (move)) {
@@ -193,7 +177,10 @@ void PSMoveController::Process ()
   if (m_postrack) {
     UpdatePosition ();
   }
+}
 
+Slaw PSMoveController::ToSlaw ()
+{
   // Quat wq = m_zeroq * m_wq;
   Quat wq = m_wq * m_zeroq ;
   
@@ -231,7 +218,7 @@ void PSMoveController::Process ()
   case Batt_CHARGING: battery = 0; break;
   case Batt_CHARGING_DONE: battery = 100; break;
   default:
-    abort ();
+    battery = -1; break;
   }
 
   Slaw blist = Slaw::List ();
@@ -264,20 +251,8 @@ void PSMoveController::Process ()
   }
 
   m = m.MapPut ("bitflag", Slaw (buttons.Count () > 0 ? 1 : 0));
-
-  struct timespec ts;
-  clock_gettime (CLOCK_REALTIME, &ts);
-
   m = m.MapPut ("buttons", buttons);
-
-  Slaw descrips = Slaw::List ("wandframe");
-  Slaw ingests = Slaw::Map ();
-  ingests = ingests.MapPut ("time", Slaw ((unt64) ts.tv_sec * 1000000 + ts.tv_nsec / 1000));
-  ingests = ingests.MapPut ("wand-report", Slaw::List (m));
-  
-  Protein p = Protein (descrips, ingests);
-
-  m_hose->Deposit (p);
+  return m;
 }
 
 void PSMoveController::LockPosition (Vect v)

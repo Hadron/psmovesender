@@ -20,8 +20,6 @@ class PSMoveController
 {
  protected:
   
-  oblong::plasma::Hose *m_hose;
-
   PSMove *move;
   PSMoveTracker *m_tracker;
   PSMoveFusion *m_fusion;
@@ -86,6 +84,10 @@ class PSMoveController
   virtual ~PSMoveController ();
 
   virtual void Process ();
+
+  virtual int FileHandle ();
+
+  virtual oblong::plasma::Slaw ToSlaw ();
 };
 
 #endif /* HADRON_PSMOVE_CONTROLLER */
