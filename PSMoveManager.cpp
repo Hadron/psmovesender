@@ -49,7 +49,33 @@ PSMoveManager::PSMoveManager ()
     abort ();
   }    
 
+  Slaw s = Slaw::FromFile ("/etc/oblong/screen.protein");
+  if (s.IsNull ()) {
+    fprintf (stderr, "Could not parse screen config.\n");
+    abort ();
+  }
+  Protein p (s);
+
+  v3float64 cent, norm, over;
+  float eye_dist;
+
+  Slaw main = p.Ingests ().MapFind ("screens").MapFind ("main");
+  bool bret = true;
+
+  bret = bret && (main.MapFind ("cent").Into (cent));
+  bret = bret && (main.MapFind ("norm").Into (norm));
+  bret = bret && (main.MapFind ("over").Into (over));
+  bret = bret && (main.MapFind ("eye-dist").Into (eye_dist));
+  if (! bret) { OB_FATAL_BUG ("unable to parse screen configuration"); abort (); }
+    
+  m_cpos = Vect (cent.x, cent.y, cent.z);
+  m_corient = Quat::QRotFromNormOver (Vect (norm.x, norm.y, norm.z),
+				      Vect (over.x, over.y, over.z));
+  m_vpos = m_cpos + (eye_dist * Vect (norm.x, norm.y, norm.z));
+  
   psmove_set_remote_config (PSMove_OnlyLocal);
+
+  OB_LOG_INFO ("writing to wands pool: '%s'", "wands");
 }
 
 int PSMoveManager::AvailableID ()
@@ -87,11 +113,9 @@ PSMoveManager::MoveRecord &PSMoveManager::FindOrCreateRecord (uint64_t addr)
 
 void PSMoveManager::SetupController (PSMoveController *c)
 {
-  Vect v (0., 1000., -700.);
-  Quat q = Quat::QRotFromNormOver (Vect (0., 0., 1.), Vect (1., 0., 0.));
-  c->SetCamera (v, q);
-  c->LockPosition (Vect (0., 1000., -400.));
-  c->SetZeroPoint (v);
+  c->SetCamera (m_cpos, m_corient);
+  c->LockPosition (m_vpos);
+  c->SetZeroPoint (m_cpos);
 }
 
 void PSMoveManager::ConnectAll ()
@@ -182,5 +206,6 @@ void PSMoveManager::Loop ()
     }
     Protein p = FrameProtein ();
     m_hose->Deposit (p);
+    usleep (10000);
   }
 }

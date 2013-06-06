@@ -15,6 +15,9 @@ class PSMoveManager
  protected:
 
   oblong::plasma::Hose *m_hose;
+  Vect m_cpos;
+  Quat m_corient;
+  Vect m_vpos;
 
   struct MoveRecord 
   {
