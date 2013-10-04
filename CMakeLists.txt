@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.8.7)
 project (psmovesender)
 
 set (G_SPEAK_MIN_VERSION "3.9")
-set (G_SPEAK_HOME /opt/oblong/g-speak3.8)
+set (G_SPEAK_HOME /opt/oblong/g-speak3.11)
 
 include (${psmovesender_SOURCE_DIR}/bld/g-speak-sdk.cmake)
 
@@ -40,7 +40,7 @@ target_link_libraries (psmovesender ${g_speak_deps_libs})
 
 set (AFRL "${psmovesender_SOURCE_DIR}/..")
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/opt/oblong/g-speak3.8/include -I${AFRL}/psmoveapi/external/hidapi/hidapi -I${AFRL}/psmoveapi/src -I${AFRL}/psmoveapi/include")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/opt/oblong/g-speak3.11/include -I${AFRL}/psmoveapi/external/hidapi/hidapi -I${AFRL}/psmoveapi/src -I${AFRL}/psmoveapi/include")
 
 target_link_libraries (psmovesender psmoveapi psmoveapi_tracker)
 

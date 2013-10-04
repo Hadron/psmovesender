@@ -14,7 +14,9 @@ endif ()
 if (NOT G_SPEAK_MIN_VERSION)
   set (G_SPEAK_MIN_VERSION "3.0")
 endif ()
-set (G_SPEAK_HOME $ENV{G_SPEAK_HOME}) # blork, $ENV isn't testable.
+if (NOT G_SPEAK_HOME)
+  set (G_SPEAK_HOME $ENV{G_SPEAK_HOME}) # blork, $ENV isn't testable.
+endif ()
 if (NOT G_SPEAK_HOME)
   execute_process(
     COMMAND ${greenhouse_SOURCE_DIR}/bld/find-gspeak-sdk ${G_SPEAK_MIN_VERSION}
