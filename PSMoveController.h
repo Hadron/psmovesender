@@ -36,7 +36,7 @@ class PSMoveController
 
   /* The width and height of the camera imaging plane, in pixels. */
   int m_imgw, m_imgh;
-  /* The notional distance of the camera imaging plan, in pixels.
+  /* The notional distance of the camera imaging plane, in pixels.
      This is computed from the FOV parameters. */
   float m_imgd;
 
@@ -44,15 +44,19 @@ class PSMoveController
   Vect m_zeropoint;
   bool m_zeropointset;
 
-  /* The known orientation of the wand in world-space when it was
+  /* The known position of the wand in world-space when it was
      zeroized. */
+  Vect m_zeropos;
+  /* The known orientation of the wand in world-space when it was
+     zeroized (as read from psmove_get_orientation_q). */
   Quat m_zeroq;
+  /* True only if the wand has been zeroized at least once. */
   bool m_zeroqset;
 
-  /* The current orientation of the wand as reported by the PSMove,
-     relative to the last zeroization. */
-  Quat m_wq;
-  
+  /* The current orientation of the wand (as reported by
+     psmove_get_orientation_q). */
+  Quat m_curq;
+
   /* The current world position of the ball of the PSMove, as calculated by the tracker. */
   Vect m_wpos;
   bool m_poslock;
@@ -66,10 +70,12 @@ class PSMoveController
   float m_wdistance;
 
   unsigned long long m_nframes;
-  unsigned long long m_lastframe;
 
   void UpdateOrientation ();
   void UpdatePosition ();
+
+  virtual void RecomputeTransforms ();
+  virtual void RecomputeHand ();
 
  public:
 

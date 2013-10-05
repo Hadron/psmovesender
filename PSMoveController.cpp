@@ -52,13 +52,13 @@ PSMoveController::PSMoveController (PSMove *m, int id)
   m_wdistance = 0.;
 
   m_nframes = 0;
-  m_lastframe = 0;
 
   if (move == NULL) {
     abort ();
   }
 
   psmove_enable_orientation (move, PSMove_True);
+  psmove_reset_orientation (move);
 }
 
 PSMoveController::~PSMoveController ()
@@ -133,64 +133,58 @@ void PSMoveController::Process ()
     m_imgd = (m_imgw / 2.) / tan (xfov);
   }
 
+  auto lastframe = m_nframes;
   while (psmove_poll (move)) {
-
     m_nframes++;
-
     if (psmove_get_buttons (move) & Btn_MOVE) {
-
-      psmove_reset_orientation (move);
-
-      /* The negative one in the z-axis is because this whole section
-	 of code actually broken, and I probably need to do some kind
-	 of T Q T^(-1) shenanigans.  But it'll do until I take a more
-	 thorough look. */
-
-      /* 'from', in model space, is the vector we want to transform to
-	 'to' in worldspace. */
-      psmove_get_orientation_q (move, m_wq);
-      Vect from = m_wq.QuatRotVect (Vect (0., 0., -1.)).Norm ();
-
-      Vect to = m_cpos - m_wpos;
-
-      Vect axis = to.Cross (from);
-      float64 angle = from.AngleWith (to, axis);
-      
-      m_zeroq = Quat::QRotFromAxisAngle (axis, angle);
-      m_zeroqset = true;
+      m_zeropos = m_wpos;
+      psmove_get_orientation_q (move, m_zeroq);
+      RecomputeTransforms ();
     }
   }
+  if (m_nframes == lastframe) { return; }
 
-  if (m_nframes == m_lastframe) {
-    return;
-  }
-  m_lastframe = m_nframes;
-
-  Quat m_nq;
-  psmove_get_orientation_q (move, m_nq);
-
-  /* Just a very stupid low-pass filter.  The psmoveapi code should be
-     doing this for us automatically, so I'm reluctant to do it
-     here. */
-  m_wq.UnitInterpSelf (0.35, m_nq);
+  psmove_get_orientation_q (move, m_curq);
+  RecomputeHand ();
 
   if (m_postrack) {
     UpdatePosition ();
   }
 }
 
+void PSMoveController::RecomputeTransforms ()
+{
+}
+
+void PSMoveController::RecomputeHand ()
+{
+}
+
+static inline Quat QuatFromVectors (Vect from, Vect to)
+{
+  Vect axis = to.Cross (from);
+  float64 angle = from.AngleWith (to, axis);
+  return Quat::QRotFromAxisAngle (axis, angle);
+}
+
 Slaw PSMoveController::ToSlaw ()
 {
-  // Quat wq = m_zeroq * m_wq;
-  Quat wq = m_wq * m_zeroq ;
-  
+  /* m_zerovec is the worldspace aim vector of the hand when the wand
+     was zeroized. */
+  Vect m_zerovec = m_zeropoint - m_zeropos;
+
+  Quat m_hzero = QuatFromVectors (Vect (0, 0, -1), m_zerovec);
+  Quat m_q = m_hzero.Invert () * m_zeroq;
+  Quat m_curhand = m_curq * m_q.Invert (); 
+
   Slaw m = Slaw::Map ();
   m = m.MapPut ("loc", m_wpos);
 
   m = m.MapPut ("name", Str ().Format ("wand-%d", m_id));
-  m = m.MapPut ("info-aim", wq.QuatRotVect (Vect (0., 0., 1.)).Norm ());
-  m = m.MapPut ("norm", wq.QuatRotVect (Vect (0., 1., 0.)).Norm ());
-  m = m.MapPut ("over", wq.QuatRotVect (Vect (1., 0., 0.)).Norm ());
+  m = m.MapPut ("wand-q", m_curq);
+  m = m.MapPut ("info-aim", m_curhand.QuatRotVect (Vect (0., 0., -1.)).Norm ());
+  m = m.MapPut ("norm", m_curhand.QuatRotVect (Vect (0., 1., 0.)).Norm ());
+  m = m.MapPut ("over", m_curhand.QuatRotVect (Vect (1., 0., 0.)).Norm ());
 
   switch (psmove_connection_type (move)) {
   case Conn_Bluetooth:
