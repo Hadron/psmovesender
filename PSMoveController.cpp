@@ -164,7 +164,7 @@ static inline Quat QuatFromVectors (Vect from, Vect to)
 {
   Vect axis = to.Cross (from);
   float64 angle = from.AngleWith (to, axis);
-  return Quat::QRotFromAxisAngle (axis, angle);
+  return Quat::QRotFromAxisAngle (axis, angle).Norm ();
 }
 
 Slaw PSMoveController::ToSlaw ()
@@ -173,9 +173,11 @@ Slaw PSMoveController::ToSlaw ()
      was zeroized. */
   Vect m_zerovec = m_zeropoint - m_zeropos;
 
+#if 1
   Quat m_hzero = QuatFromVectors (Vect (0, 0, -1), m_zerovec);
-  Quat m_q = m_hzero.Invert () * m_zeroq;
-  Quat m_curhand = m_curq * m_q.Invert (); 
+  Quat m_q = m_zeroq * m_hzero.Invert ();
+  Quat m_curhand = m_zeroq.Invert () * m_curq;
+#endif
 
   Slaw m = Slaw::Map ();
   m = m.MapPut ("loc", m_wpos);
