@@ -40,7 +40,7 @@ target_link_libraries (psmovesender ${g_speak_deps_libs})
 
 set (AFRL "${psmovesender_SOURCE_DIR}/..")
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/opt/oblong/g-speak3.11/include -I${AFRL}/psmoveapi/external/hidapi/hidapi -I${AFRL}/psmoveapi/src -I${AFRL}/psmoveapi/include")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/opt/oblong/g-speak3.11/include -I${AFRL}/psmoveapi/src -I${AFRL}/psmoveapi/include -I/usr/include/hidapi")
 
 target_link_libraries (psmovesender psmoveapi psmoveapi_tracker)
 
