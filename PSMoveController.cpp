@@ -1,25 +1,29 @@
-#include <psmoveapi/psmove.h>
-#include <psmoveapi/psmove_tracker.h>
-#include <psmoveapi/psmove_fusion.h>
+/* Copyright (c) 2012-2013, Hadron Industries, Inc. */
+
+#include "PSMoveController.h"
 
 #include <opencv2/highgui/highgui_c.h>
 
 #include <stdio.h>
 #include <poll.h>
 
-#include <libPlasma/c++/Slaw.h>
-#include <libPlasma/c++/Protein.h>
+#include "quaternion.h"
 
-#include "PSMoveController.h"
+typedef PSMoveController::Quaternion Quaternion;
+typedef PSMoveController::Vector_3 Vector_3;
+typedef PSMoveController::Point_3 Point_3;
 
-using namespace oblong::plasma;
-
-static inline Quat psmove_get_orientation_q (PSMove *move, Quat &q)
+static inline Quaternion psmove_get_orientation_q (PSMove *move, Quaternion &q)
 {
-    float w, x, y, z;
-    psmove_get_orientation (move, &w, &x, &y, &z);
-    q.a = w; q.i = x; q.j = y; q.k = z;
-    q.NormSelf ();
+  float w, x, y, z;
+  psmove_get_orientation (move, &w, &x, &y, &z);
+
+  q = normalize (Quaternion (w, x, y, z));
+}
+
+void PSMoveController::Bind (PSMoveManager *m)
+{
+  m_manager = m;
 }
 
 PSMoveController::PSMoveController (PSMove *m, int id)
@@ -37,10 +41,10 @@ PSMoveController::PSMoveController (PSMove *m, int id)
   m_imgh = -1;
   m_imgd = 0.;
 
-  m_zeropoint = Vect (0., 0., 0.);
+  m_zeropoint = Point_3 (0., 0., 0.);
   m_zeropointset = false;
 
-  m_zeroq = Quat::QRotFromNormOver (Vect (0., 0., -1.), Vect (1., 0., 0.));
+  m_zeroq = Quaternion (1, 0, 0, 0);
   m_zeroqset = false;
   
   m_poslock = false;
@@ -92,10 +96,10 @@ void PSMoveController::UpdatePosition ()
   float xrel = (m_imgw / 2) - m_wx;
   float yrel = (m_imgh / 2) - m_wy;
 
-  Vect imgpt (xrel, yrel, m_imgd);
-  Vect unit = imgpt.Norm ();
+  Vector_3 imgpt (xrel, yrel, m_imgd);
+  Vector_3 unit = imgpt / sqrt (imgpt.squared_length ());
   
-  m_wpos = m_cpos + m_corient.QuatRotVect (unit * m_wdistance);
+  m_wpos = m_cpos + rotate (m_corient, (unit * m_wdistance));
 }
 
 int PSMoveController::FileHandle ()
@@ -150,108 +154,32 @@ void PSMoveController::Process ()
   if (m_postrack) {
     UpdatePosition ();
   }
+
+  NotifyChanged ();
 }
 
 void PSMoveController::RecomputeTransforms ()
 {
 }
 
+Quaternion PSMoveController::GetHand ()
+{
+  /* m_zerovec is the worldspace aim vector of the hand when the wand
+     was zeroized. */
+  Vector_3 m_zerovec = m_zeropoint - m_zeropos;
+
+  Quaternion m_hzero = from_to (Vector_3 (0, 0, -1), m_zerovec);
+  Quaternion m_q = m_zeroq * inverse (m_hzero);
+  Quaternion m_curhand = inverse (m_zeroq) * m_curq;
+
+  return m_curhand;
+}
+
 void PSMoveController::RecomputeHand ()
 {
 }
 
-static inline Quat QuatFromVectors (Vect from, Vect to)
-{
-  Vect axis = to.Cross (from);
-  float64 angle = from.AngleWith (to, axis);
-  return Quat::QRotFromAxisAngle (axis, angle).Norm ();
-}
-
-Slaw PSMoveController::ToSlaw ()
-{
-  /* m_zerovec is the worldspace aim vector of the hand when the wand
-     was zeroized. */
-  Vect m_zerovec = m_zeropoint - m_zeropos;
-
-#if 1
-  Quat m_hzero = QuatFromVectors (Vect (0, 0, -1), m_zerovec);
-  Quat m_q = m_zeroq * m_hzero.Invert ();
-  Quat m_curhand = m_zeroq.Invert () * m_curq;
-#endif
-
-  Slaw m = Slaw::Map ();
-  m = m.MapPut ("loc", m_wpos);
-
-  m = m.MapPut ("name", Str ().Format ("wand-%d", m_id));
-  m = m.MapPut ("wand-q", m_curq);
-  m = m.MapPut ("info-aim", m_curhand.QuatRotVect (Vect (0., 0., -1.)).Norm ());
-  m = m.MapPut ("norm", m_curhand.QuatRotVect (Vect (0., 1., 0.)).Norm ());
-  m = m.MapPut ("over", m_curhand.QuatRotVect (Vect (1., 0., 0.)).Norm ());
-
-  switch (psmove_connection_type (move)) {
-  case Conn_Bluetooth:
-    m = m.MapPut ("connection-type", "bluetooth"); break;
-  case Conn_USB:
-    m = m.MapPut ("connection-type", "usb"); break;
-  default:
-    m = m.MapPut ("connection-type", "unknown"); break;
-  }
-
-  m = m.MapPut ("serial", Slaw (Str (psmove_get_serial (move))));
-
-  m = m.MapPut ("temperature", Slaw ((float32) psmove_get_temperature_in_celsius (move)));
-
-  int bflags = psmove_get_battery (move);
-  int battery = 0;
-
-  switch (bflags) {
-  case Batt_MIN: battery = 0; break;
-  case Batt_20Percent: battery = 20; break;
-  case Batt_40Percent: battery = 40; break;
-  case Batt_60Percent: battery = 60; break;
-  case Batt_80Percent: battery = 80; break;
-  case Batt_MAX: battery = 100; break;
-  case Batt_CHARGING: battery = 0; break;
-  case Batt_CHARGING_DONE: battery = 100; break;
-  default:
-    battery = -1; break;
-  }
-
-  Slaw blist = Slaw::List ();
-
-  m = m.MapPut ("battery-level", battery);
-  if (bflags == Batt_CHARGING) {
-    blist = blist.ListAppend ("charging");
-  } else if (bflags == Batt_CHARGING_DONE) {
-    blist = blist.ListAppend ("charged");
-  }
-    
-  m = m.MapPut ("battery-flags", blist);
-
-  Slaw buttons = Slaw::List ();
-
-  const char *psmove_button_names[] = { 
-    "L2", "R2", "L1", "R1",
-    "Triangle", "Circle", "Cross", "Square",
-    "Select", "L3", "R3", "Start",
-    "Up", "Right", "Down", "Left",
-    "PS", "Unknown", "Unknown", "Move",
-    "Trigger"
-  };
-
-  unsigned int bval = psmove_get_buttons (move);
-  for (int i = 0; i < sizeof (psmove_button_names) / sizeof (char *); i++) {
-    if (bval & (1 << i)) {
-      buttons = buttons.ListAppend (psmove_button_names[i]);
-    }
-  }
-
-  m = m.MapPut ("bitflag", Slaw (buttons.Count () > 0 ? 1 : 0));
-  m = m.MapPut ("buttons", buttons);
-  return m;
-}
-
-void PSMoveController::LockPosition (Vect v)
+void PSMoveController::LockPosition (Point_3 v)
 {
   m_wpos = v;
   m_poslock = true;
@@ -264,15 +192,20 @@ void PSMoveController::TrackPosition ()
   m_postrack = true;
 }
 
-void PSMoveController::SetCamera (Vect v, Quat q)
+void PSMoveController::SetCamera (Point_3 v, Quaternion q)
 {
   m_cpos = v;
   m_corient = q;
   m_cset = true;
 }
 
-void PSMoveController::SetZeroPoint (Vect v)
+void PSMoveController::SetZeroPoint (Point_3 v)
 {
   m_zeropoint = v;
   m_zeropointset = true;
 }
+
+void PSMoveController::NotifyChanged ()
+{
+}
+

@@ -1,3 +1,7 @@
+#include "PSMoveManager.h"
+
+#include <poll.h>
+
 #include <unordered_map>
 #include <vector>
 #include <array>
@@ -5,11 +9,7 @@
 #include <wchar.h>
 #include <stdint.h>
 
-#include "PSMoveManager.h"
-
 #include "psmove_private.h"
-
-using namespace oblong::plasma;
 
 const uint64_t INVALID_BTADDR = (uint64_t) -1;
 
@@ -42,40 +42,7 @@ static inline uint64_t parse_btaddr (const wchar_t *s)
 
 PSMoveManager::PSMoveManager ()
 {
-  oblong::loam::ObRetort ret;
-  m_hose = Pool::Participate ("wands", Pool::MMAP_MEDIUM, &ret);
-  if (ret.IsError ()) {
-    fprintf (stderr, "Could not connect to controller.\n");
-    abort ();
-  }    
-
-  Slaw s = Slaw::FromFile ("/etc/oblong/screen.protein");
-  if (s.IsNull ()) {
-    fprintf (stderr, "Could not parse screen config.\n");
-    abort ();
-  }
-  Protein p (s);
-
-  v3float64 cent, norm, over;
-  float eye_dist;
-
-  Slaw main = p.Ingests ().MapFind ("screens").MapFind ("main");
-  bool bret = true;
-
-  bret = bret && (main.MapFind ("cent").Into (cent));
-  bret = bret && (main.MapFind ("norm").Into (norm));
-  bret = bret && (main.MapFind ("over").Into (over));
-  bret = bret && (main.MapFind ("eye-dist").Into (eye_dist));
-  if (! bret) { OB_FATAL_BUG ("unable to parse screen configuration"); abort (); }
-    
-  m_cpos = Vect (cent.x, cent.y, cent.z);
-  m_corient = Quat::QRotFromNormOver (Vect (norm.x, norm.y, norm.z),
-				      Vect (over.x, over.y, over.z));
-  m_vpos = m_cpos + (eye_dist * Vect (norm.x, norm.y, norm.z));
-  
   psmove_set_remote_config (PSMove_OnlyLocal);
-
-  OB_LOG_INFO ("writing to wands pool: '%s'", "wands");
 }
 
 int PSMoveManager::AvailableID ()
@@ -131,7 +98,7 @@ void PSMoveManager::ConnectAll ()
 
   for (cur = devs; cur != NULL; cur = cur->next) {
     /* Only consider Bluetooth devices. */
-
+    
     if ((cur->serial_number == NULL) || (wcslen (cur->serial_number) == 0)) {
       continue;
     }
@@ -148,6 +115,7 @@ void PSMoveManager::ConnectAll ()
     PSMove *move = psmove_connect_internal (cur->serial_number, cur->path, record.id);
     if (move == NULL) { abort (); }
     record.controller = new PSMoveController (move, record.id);
+    record.controller->Bind (this);
     record.flag = true;
 
     SetupController (record.controller);
@@ -164,48 +132,42 @@ void PSMoveManager::ConnectAll ()
   }
 }
 
-Protein PSMoveManager::FrameProtein ()
+void PSMoveManager::Process ()
 {
-  Slaw reports = Slaw::List ();
-  
+  std::vector<struct pollfd> fdvec;
+
   for (auto w : m_wands) {
-    reports = reports.ListAppend (w.second.controller->ToSlaw ());
+    struct pollfd p;
+    p.fd = w.second.controller->FileHandle();
+    p.events = POLLIN;
+    p.revents = 0;
+    fdvec.push_back (p);
   }
 
-  struct timespec ts;
-  clock_gettime (CLOCK_REALTIME, &ts);
+  auto fdptr = &(*fdvec.begin());
 
-  Slaw descrips = Slaw::List ("wandframe");
-  Slaw ingests = Slaw::Map ();
-  ingests = ingests.MapPut ("time", Slaw ((unt64) ts.tv_sec * 1000000 + ts.tv_nsec / 1000));
-  ingests = ingests.MapPut ("wand-report", reports);
+  int ret = poll (fdptr, fdvec.size(), 10);
   
-  return Protein (descrips, ingests);
+  if (ret < 0) {
+    throw (ret);
+  }
+
+  if (ret != 0) {
+    for (auto w : m_wands) {
+      w.second.controller->Process ();
+    }
+  }
+
+  Heartbeat ();
 }
 
 void PSMoveManager::Loop ()
 {
-#if 0
-  {
-    struct pollfd fds;
-
-    fds.fd = fd;
-    fds.events = POLLIN;
-    fds.revents = 0;
-    int ret = poll (&fds, 1, 1000000);
-    if (ret == -1 || ret == 0)
-      return;
-    if (fds.revents & (POLLERR | POLLHUP | POLLNVAL))
-      return;
-  }
-#endif
-
   for (;;) {
-    for (auto w : m_wands) {
-      w.second.controller->Process ();
-    }
-    Protein p = FrameProtein ();
-    m_hose->Deposit (p);
-    usleep (10000);
+    Process ();
   }
+}
+
+void PSMoveManager::Heartbeat ()
+{
 }

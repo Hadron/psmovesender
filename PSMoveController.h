@@ -1,3 +1,5 @@
+/* Copyright (c) 2012-2013, Hadron Industries, Inc. */
+
 #ifndef HADRON_PSMOVE_CONTROLLER
 #define HADRON_PSMOVE_CONTROLLER
 
@@ -5,21 +7,24 @@
 #include <psmoveapi/psmove_tracker.h>
 #include <psmoveapi/psmove_fusion.h>
 
-#include <opencv2/highgui/highgui_c.h>
+#include <CGAL/Simple_cartesian.h>
 
-#include <libLoam/c++/Quat.h>
-#include <libLoam/c++/Vect.h>
-#include <libLoam/c++/Str.h>
+#include <boost/math/quaternion.hpp>
 
-#include <libPlasma/c++/Pool.h>
-#include <libPlasma/c++/Hose.h>
-
-using namespace oblong::loam;
+struct PSMoveManager;
 
 class PSMoveController
 {
+ public:
+
+  typedef CGAL::Simple_cartesian<double> K;
+  typedef K::Vector_3 Vector_3;
+  typedef K::Point_3 Point_3;
+  typedef boost::math::quaternion<double> Quaternion;
+
  protected:
   
+  PSMoveManager *m_manager;
   PSMove *move;
   PSMoveTracker *m_tracker;
   PSMoveFusion *m_fusion;
@@ -30,8 +35,8 @@ class PSMoveController
   /* All positions are in g-speak coordinates. */
 
   /* The position and orientation of the camera zero-point itself. */
-  Vect m_cpos;
-  Quat m_corient;
+  Point_3 m_cpos;
+  Quaternion m_corient;
   bool m_cset;
 
   /* The width and height of the camera imaging plane, in pixels. */
@@ -41,24 +46,24 @@ class PSMoveController
   float m_imgd;
 
   /* The point to which the wand should be pointing when reset. */
-  Vect m_zeropoint;
+  Point_3 m_zeropoint;
   bool m_zeropointset;
 
   /* The known position of the wand in world-space when it was
      zeroized. */
-  Vect m_zeropos;
+  Point_3 m_zeropos;
   /* The known orientation of the wand in world-space when it was
      zeroized (as read from psmove_get_orientation_q). */
-  Quat m_zeroq;
+  Quaternion m_zeroq;
   /* True only if the wand has been zeroized at least once. */
   bool m_zeroqset;
 
   /* The current orientation of the wand (as reported by
      psmove_get_orientation_q). */
-  Quat m_curq;
+  Quaternion m_curq;
 
   /* The current world position of the ball of the PSMove, as calculated by the tracker. */
-  Vect m_wpos;
+  Point_3 m_wpos;
   bool m_poslock;
   bool m_postrack;
 
@@ -81,19 +86,22 @@ class PSMoveController
 
   PSMoveController (PSMove *m, int id);
 
-  virtual void SetCamera (Vect v, Quat q);
-  virtual void SetZeroPoint (Vect v);
+  virtual void Bind (PSMoveManager *m);
 
-  virtual void LockPosition (Vect v);
+  virtual void SetCamera (Point_3 v, Quaternion q);
+  virtual void SetZeroPoint (Point_3 v);
+
+  virtual void LockPosition (Point_3 v);
   virtual void TrackPosition ();
 
   virtual ~PSMoveController ();
 
   virtual void Process ();
 
+  Quaternion GetHand ();
+  
   virtual int FileHandle ();
-
-  virtual oblong::plasma::Slaw ToSlaw ();
+  virtual void NotifyChanged ();
 };
 
 #endif /* HADRON_PSMOVE_CONTROLLER */

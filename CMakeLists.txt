@@ -33,10 +33,24 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g_speak_deps_cflags} -std=c++11 -g -O
 add_executable (psmovesender
   PSMoveController.cpp
   PSMoveManager.cpp
+  PSMoveWandController.cpp
+  PSMoveWandManager.cpp
+  PSMoveHIDMouseController.cpp
+  PSMoveHIDMouseManager.cpp
+  HIDSender.cpp
+  FGParser.cpp
+  quaternion.cpp
   main.cpp
 )
 
-target_link_libraries (psmovesender ${g_speak_deps_libs})
+add_executable (test
+  FGParser.cpp
+  test.cpp
+)
+
+target_link_libraries (psmovesender ${g_speak_deps_libs} CGAL)
+
+target_link_libraries (test boost_system CGAL)
 
 set (AFRL "${psmovesender_SOURCE_DIR}/..")
 

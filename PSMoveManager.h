@@ -1,3 +1,8 @@
+/* Copyright (c) 2012-2013, Hadron Industries, Inc. */
+
+#ifndef HADRON_PSMOVE_MANAGER
+#define HADRON_PSMOVE_MANAGER
+
 #include "PSMoveController.h"
 
 #include <unordered_map>
@@ -5,19 +10,17 @@
 
 #include "hidapi.h"
 
-#include <libPlasma/c++/Pool.h>
-#include <libPlasma/c++/Hose.h>
-
 class PSMoveController;
 
 class PSMoveManager
 {
  protected:
 
-  oblong::plasma::Hose *m_hose;
-  Vect m_cpos;
-  Quat m_corient;
-  Vect m_vpos;
+  PSMoveController::Point_3 m_cpos;
+  PSMoveController::Point_3 m_vpos;
+  PSMoveController::Quaternion m_corient;
+
+  typedef size_t BTAddr;
 
   struct MoveRecord 
   {
@@ -30,12 +33,19 @@ class PSMoveManager
   std::unordered_map <uint64_t, MoveRecord> m_wands;
 
   int AvailableID ();
+  virtual PSMoveController *CreateController (PSMove *m, int id)
+  { return new PSMoveController (m, id); }
   void SetupController (PSMoveController *c);
   MoveRecord &FindOrCreateRecord (uint64_t);
-  oblong::plasma::Protein FrameProtein ();
 
 public:
   PSMoveManager ();
   void ConnectAll ();
-  void Loop ();
+
+  virtual void Process ();
+  virtual void Loop ();
+
+  virtual void Heartbeat ();
 };
+
+#endif /* HADRON_PSMOVE_MANAGER */
