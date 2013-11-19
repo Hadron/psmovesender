@@ -30,7 +30,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g_speak_deps_cflags} -frounding-math 
 
 set (AFRL "${psmovesender_SOURCE_DIR}/..")
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${AFRL}/psmoveapi/src -I${AFRL}/psmoveapi/include -I/usr/include/hidapi")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${CMAKE_CURRENT_BINARY_DIR} -I${AFRL}/psmoveapi/src -I${AFRL}/psmoveapi/include -I/usr/include/hidapi")
 
 include(GNUInstallDirs)
 
