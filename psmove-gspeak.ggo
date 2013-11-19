@@ -1,0 +1,5 @@
+package "psmove-gspeak"
+version "1.0"
+
+option "wands-pool" - "The name of the wands output pool."
+string default="wands" optional

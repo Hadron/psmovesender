@@ -1,0 +1,5 @@
+package "psmove-mouse"
+version "1.0"
+
+option "cavelayout" - "The screen geometry"
+string default="/etc/cavelayout.xml" typestr="filename" optional
