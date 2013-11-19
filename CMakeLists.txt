@@ -2,6 +2,16 @@ cmake_minimum_required (VERSION 2.8.7)
 
 project (psmovesender)
 
+FILE (READ "${CMAKE_CURRENT_SOURCE_DIR}/debian/changelog" DEBCHANGELOG)
+STRING (REGEX REPLACE ".*\\((.*)\\).*" "\\1" DEBFULLVERSION "${DEBCHANGELOG}")
+message(STATUS "Building Debian version: " ${DEBFULLVERSION})
+
+SET(DEBFULLVERSION ${DEBFULLVERSION} CACHE INTERNAL "Full package version." FORCE)
+
+if(NOT DEBFULLVERSION)
+  message(FATAL_ERROR "unable to find debian version")
+endif(NOT DEBFULLVERSION)
+
 find_file(HELP2MAN_EXECUTABLE help2man HINTS /bin /usr/bin /usr/local/bin)
 if(NOT HELP2MAN_EXECUTABLE)
   message(FATAL_ERROR "unable to find help2man")
@@ -43,13 +53,13 @@ ENDIF(NOT GENGETOPT_EXECUTABLE)
 
 ADD_CUSTOM_COMMAND(
   OUTPUT psmove-mouse-options.c psmove-mouse-options.h
-  COMMAND ${GENGETOPT_EXECUTABLE} ARGS -F psmove-mouse-options --input=${CMAKE_CURRENT_SOURCE_DIR}/psmove-mouse.ggo
+  COMMAND ${GENGETOPT_EXECUTABLE} ARGS --set-version v${DEBFULLVERSION} -F psmove-mouse-options --input=${CMAKE_CURRENT_SOURCE_DIR}/psmove-mouse.ggo
   DEPENDS psmove-mouse.ggo
   )
 
 ADD_CUSTOM_COMMAND(
   OUTPUT psmove-gspeak-options.c psmove-gspeak-options.h
-  COMMAND ${GENGETOPT_EXECUTABLE} ARGS -F psmove-gspeak-options --input=${CMAKE_CURRENT_SOURCE_DIR}/psmove-gspeak.ggo
+  COMMAND ${GENGETOPT_EXECUTABLE} ARGS --set-version v${DEBFULLVERSION} -F psmove-gspeak-options --input=${CMAKE_CURRENT_SOURCE_DIR}/psmove-gspeak.ggo
   DEPENDS psmove-gspeak.ggo
   )
 
