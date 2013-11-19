@@ -1,5 +1,5 @@
 Source: psmovesender
-Section: devel
+Section: utils
 Priority: optional
 Maintainer: Klee Dienes <klee@mit.edu>
 Build-Depends: debhelper (>= 9), autotools-dev, cmake, gengetopt, help2man
@@ -7,10 +7,10 @@ Standards-Version: 3.9.4
 Homepage: http://www.hadronindustries.com
 
 Package: psmove-mouse
-Section: devel
+Section: utils
 Architecture: any
 Multi-Arch: foreign
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: PlayStation Move mouse emulator
  This package generates synthetic USB HID tablet events driven by a
  PlayStation Move controller.  The user can specify a system
@@ -19,10 +19,10 @@ Description: PlayStation Move mouse emulator
  pointing.
 
 Package: psmove-gspeak
-Section: non-free
+Section: contrib/utils
 Architecture: any
 Multi-Arch: foreign
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: PlayStation Move g-speak wand emulator
  This package generates g-speak wand events driven by a PlayStation
  Move controller.

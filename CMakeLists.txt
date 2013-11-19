@@ -43,7 +43,7 @@ add_executable (psmove-mouse
   psmove-mouse.cpp
   psmove-mouse.1
 )
-manpage(psmove-mouse)
+manpage(psmove-mouse "emulate USB HID mouse/tablet with PlayStation Move")
 target_link_libraries (psmove-mouse psmoveapi psmoveapi_tracker CGAL boost_system)
 install (TARGETS psmove-mouse RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
@@ -63,7 +63,7 @@ add_executable (psmove-gspeak
   psmove-gspeak.cpp
   psmove-gspeak.1
 )
-manpage(psmove-gspeak)
+manpage(psmove-gspeak "emulate g-speak wand with PlayStation Move")
 target_link_libraries (psmove-gspeak psmoveapi psmoveapi_tracker CGAL boost_system)
 target_link_libraries (psmove-gspeak ${g_speak_deps_libs})
 install (TARGETS psmove-gspeak RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -8,11 +8,12 @@ if(NOT SED_EXECUTABLE)
   message(FATAL_ERROR "unable to find sed")
 endif(NOT SED_EXECUTABLE)
 
-macro(manpage program)
+macro(manpage program description)
 ADD_CUSTOM_COMMAND (
   OUTPUT ${program}.1
   DEPENDS ${program}
   COMMAND ${HELP2MAN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/${program}
+  -n "${description}"
   --no-info
   --output=${CMAKE_CURRENT_BINARY_DIR}/${program}.1
   COMMAND ${SED_EXECUTABLE} -i "s#${CMAKE_CURRENT_BINARY_DIR}/##g" ${CMAKE_CURRENT_BINARY_DIR}/${program}.1

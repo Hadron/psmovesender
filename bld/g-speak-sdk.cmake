@@ -46,9 +46,7 @@ endif ()
 set (ENV{PKG_CONFIG_PATH} "${G_SPEAK_HOME}/lib/pkgconfig")
 
 set (g_speak_deps "")
-foreach (g_speak_dep libLoam libLoam++ libPlasma libPlasma++ libBasement
-                     libImpetus libAfferent libNoodoo libGestation libMedia
-                     libTwillig libPlasmaZeroconf)
+foreach (g_speak_dep libLoam libLoam++ libPlasma libPlasma++ libBasement)
   set (g_speak_deps "${g_speak_deps} ${g_speak_dep}")
 endforeach ()
 
