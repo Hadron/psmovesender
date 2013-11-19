@@ -6,19 +6,24 @@ Build-Depends: debhelper (>= 9), autotools-dev, cmake, libtinyxml-dev
 Standards-Version: 3.9.4
 Homepage: http://www.hadronindustries.com
 
-Package: psmovesender
+Package: psmove-mouse
 Section: devel
 Architecture: any
 Multi-Arch: foreign
 Depends: ${shlibs:Depends}
-Description: PSMove wand emulator
- This package contains development libraries and headers for the CIGI
- class library (CCL).  The CCL is a C++ language library for
- implementing CIGI in both host and IG applications.
+Description: PlayStation Move mouse emulator
+ This package generates synthetic USB HID tablet events driven by a
+ PlayStation Move controller.  The user can specify a system
+ configuration describing their screen layout, and the location of the
+ mouse cursor is based on the place on the screen to which the user is
+ pointing.
+
+Package: psmove-gspeak
+Section: non-free
+Architecture: any
+Multi-Arch: foreign
+Depends: ${shlibs:Depends}
+Description: PlayStation Move g-speak wand emulator
+ This package generates g-speak wand events driven by a PlayStation
+ Move controller.
  .
- Some features of the CCL include:
- .
-  * Handles packing, unpacking, and byte swapping automatically
-  * Handles output buffer management
-  * Can handle most of the input buffer management with simple calls
-  * Can translate between different versions of CIGI

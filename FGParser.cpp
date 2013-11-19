@@ -5,8 +5,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <tinyxml2.h>
-
 #include "FGParser.h"
 
 Window::Window (boost::property_tree::ptree pt_) : pt (pt_)
@@ -203,13 +201,13 @@ void Camera::push_facets (std::vector<ScreenTriangle> &l)
   auto br = port.point (1, 0);
   auto ul = port.point (0, 1);
   auto ur = port.point (1, 1);
-  l.push_back (ScreenTriangle (*this, bl, ul, ur));
-  l.push_back (ScreenTriangle (*this, bl, ur, br));
+  l.push_back (ScreenTriangle (this, bl, ul, ur));
+  l.push_back (ScreenTriangle (this, bl, ur, br));
 }
 
 std::ostream &operator << (std::ostream &out, const CameraGroup::Intersection &i)
 {
-  out << i.camera.name() << ": [" <<  i.location << "] (" << i.px << ", " << i.py << ")";
+  out << i.camera->name() << ": [" <<  i.location << "] (" << i.px << ", " << i.py << ")";
   return out;
 }
 

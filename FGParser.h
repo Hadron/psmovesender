@@ -27,9 +27,9 @@ class Camera;
 class ScreenTriangle : public K::Triangle_3
 {
 public:
-  ScreenTriangle (Camera &camera_, Point p1, Point p2, Point p3)
+  ScreenTriangle (const Camera *camera_, Point p1, Point p2, Point p3)
     : K::Triangle_3 (p1, p2, p3), camera (camera_) { }
-  Camera &camera;
+  const Camera *camera;
 };
 
 class Screen
@@ -144,10 +144,10 @@ class CameraGroup
  public:
 
   struct Intersection {
-    Camera &camera;
+    const Camera *camera;
     K::Point_3 location;
     double px, py;
-    Intersection (Camera &camera_, K::Point_3 location_, double px_, double py_)
+    Intersection (const Camera *camera_, K::Point_3 location_, double px_, double py_)
     : camera (camera_), location (location_), px (px_), py (py_) { }
     friend std::ostream &operator << (std::ostream &out, const Intersection &i);
   };
@@ -176,9 +176,9 @@ template <typename OutputIterator> void CameraGroup::Intersections (K::Ray_3 ray
 
     if (CGAL::assign (point, object)) {
 
-      std::pair<double, double> loc = id->camera.port.project (point);
+      std::pair<double, double> loc = id->camera->port.project (point);
 
-      Camera::Viewport &v = id->camera.viewport;
+      const Camera::Viewport &v = id->camera->viewport;
       double nx = v.x + (loc.first * v.width);
       double ny = v.y + (loc.second * v.height);
       

@@ -44,3 +44,24 @@ else ()
   set (PKG_CONFIG_EXECUTABLE pkg-config)
 endif ()
 set (ENV{PKG_CONFIG_PATH} "${G_SPEAK_HOME}/lib/pkgconfig")
+
+set (g_speak_deps "")
+foreach (g_speak_dep libLoam libLoam++ libPlasma libPlasma++ libBasement
+                     libImpetus libAfferent libNoodoo libGestation libMedia
+                     libTwillig libPlasmaZeroconf)
+  set (g_speak_deps "${g_speak_deps} ${g_speak_dep}")
+endforeach ()
+
+execute_process (
+  COMMAND ${PKG_CONFIG_EXECUTABLE} ${g_speak_deps} --cflags
+  OUTPUT_VARIABLE g_speak_deps_cflags
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+string (REGEX REPLACE " -pthread" "" g_speak_deps_cflags "${g_speak_deps_cflags}")
+
+execute_process (
+  COMMAND ${PKG_CONFIG_EXECUTABLE} ${g_speak_deps} --libs --static
+  OUTPUT_VARIABLE g_speak_deps_libs
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)

@@ -9,7 +9,9 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
-#include <linux/uhid.h>
+
+// #include <linux/uhid.h>
+#include "uhid.h"
 
 static unsigned char descriptor[] = {
 

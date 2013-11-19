@@ -74,7 +74,7 @@ PSMoveManager::MoveRecord &PSMoveManager::FindOrCreateRecord (uint64_t addr)
     return m_wands[addr];
   }
 
-  m_wands.emplace (std::make_pair (addr, MoveRecord ()));
+  m_wands.insert (std::make_pair (addr, MoveRecord ()));
   return m_wands[addr];
 }
 
