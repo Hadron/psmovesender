@@ -8,7 +8,7 @@ include (${psmovesender_SOURCE_DIR}/bld/help2man.cmake)
 
 if (TRUE)
 set (G_SPEAK_MIN_VERSION "3.10")
-set (G_SPEAK_HOME /opt/oblong/g-speak3.10)
+set (G_SPEAK_HOME /opt/oblong/g-speak3.11)
 include (${psmovesender_SOURCE_DIR}/bld/g-speak-sdk.cmake)
 else ()
 endif ()
@@ -44,7 +44,7 @@ add_executable (psmove-mouse
   psmove-mouse.1
 )
 manpage(psmove-mouse)
-target_link_libraries (psmove-mouse psmoveapi psmoveapi_tracker CGAL)
+target_link_libraries (psmove-mouse psmoveapi psmoveapi_tracker CGAL boost_system)
 install (TARGETS psmove-mouse RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if (G_SPEAK_HOME)
@@ -64,7 +64,7 @@ add_executable (psmove-gspeak
   psmove-gspeak.1
 )
 manpage(psmove-gspeak)
-target_link_libraries (psmove-gspeak psmoveapi psmoveapi_tracker CGAL)
+target_link_libraries (psmove-gspeak psmoveapi psmoveapi_tracker CGAL boost_system)
 target_link_libraries (psmove-gspeak ${g_speak_deps_libs})
 install (TARGETS psmove-gspeak RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 

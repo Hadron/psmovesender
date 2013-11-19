@@ -2,7 +2,7 @@ Source: psmovesender
 Section: devel
 Priority: optional
 Maintainer: Klee Dienes <klee@mit.edu>
-Build-Depends: debhelper (>= 9), autotools-dev, cmake, libtinyxml-dev
+Build-Depends: debhelper (>= 9), autotools-dev, cmake, gengetopt, help2man
 Standards-Version: 3.9.4
 Homepage: http://www.hadronindustries.com
 
