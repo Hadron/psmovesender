@@ -12,7 +12,7 @@ class PSMoveHIDMouseController : public PSMoveController
   HIDSender m_sender;
 
  public:
-  PSMoveHIDMouseController (CameraGroup &cg, PSMove *m, int id) : m_cg (cg), PSMoveController (m, id), m_sender ("hello") { }
+  PSMoveHIDMouseController (CameraGroup &cg, PSMove *m, int id);
 
   virtual void NotifyChanged ();
 };

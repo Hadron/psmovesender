@@ -22,6 +22,14 @@ void PSMoveHIDMouseController::NotifyChanged ()
     m_sender.SetPosition (p->px, p->py);
   }
 
-  m_sender.SetFlags (psmove_get_buttons (move));
+  bool set = psmove_get_buttons (move) & (~(PSMove_Button::Btn_MOVE));
+
+  m_sender.SetFlags (set);
   m_sender.Process ();
+}
+
+PSMoveHIDMouseController::PSMoveHIDMouseController (CameraGroup &cg, PSMove *m, int id)
+  : m_cg (cg), PSMoveController (m, id), m_sender ("PSMove pointer " + std::to_string (id))
+{
+  m_sender.Open ();
 }
