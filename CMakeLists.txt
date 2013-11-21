@@ -27,7 +27,7 @@ add_custom_command (
   COMMAND ${GENGETOPT_EXECUTABLE} ARGS --set-version ${DEBFULLVERSION} -F psmove-mouse-options --input=${CMAKE_CURRENT_SOURCE_DIR}/psmove/psmove-mouse.ggo
   DEPENDS psmove/psmove-mouse.ggo
   )
-set_source_files_properties (psmove/psmove-mouse.c PROPERTIES OBJECT_DEPENDS psmove-mouse-options.h)
+set_source_files_properties (psmove/psmove-mouse.cpp PROPERTIES OBJECT_DEPENDS psmove-mouse-options.h)
 add_executable (psmove-mouse
   psmove/PSMoveController.cpp
   psmove/PSMoveManager.cpp
