@@ -33,8 +33,7 @@ class PSMoveManager
   std::unordered_map <uint64_t, MoveRecord> m_wands;
 
   int AvailableID ();
-  virtual PSMoveController *CreateController (PSMove *m, int id)
-  { return new PSMoveController (m, id); }
+  virtual PSMoveController *CreateController (PSMove *m, int id) = 0;
   void SetupController (PSMoveController *c);
   MoveRecord &FindOrCreateRecord (uint64_t);
 
