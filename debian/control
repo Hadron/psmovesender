@@ -18,6 +18,17 @@ Description: PlayStation Move mouse emulator
  mouse cursor is based on the place on the screen to which the user is
  pointing.
 
+Package: gspeak-uhid
+Section: contrib/utils
+Architecture: any
+Multi-Arch: foreign
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: g-speak uhid-based mouse emulator
+ This package generates synthetic USB HID tablet events driven by any
+ g-speak pointing device.  Harden events are converted to button 1.
+ This is designed to be used with the multi-pointer support in
+ XInput2.
+
 Package: psmove-gspeak
 Section: contrib/utils
 Architecture: any
@@ -26,4 +37,3 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: PlayStation Move g-speak wand emulator
  This package generates g-speak wand events driven by a PlayStation
  Move controller.
- .

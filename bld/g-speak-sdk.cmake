@@ -45,10 +45,7 @@ else ()
 endif ()
 set (ENV{PKG_CONFIG_PATH} "${G_SPEAK_HOME}/lib/pkgconfig")
 
-set (g_speak_deps "")
-foreach (g_speak_dep libLoam libLoam++ libPlasma libPlasma++ libBasement)
-  set (g_speak_deps "${g_speak_deps} ${g_speak_dep}")
-endforeach ()
+macro (SET_GSPEAK_FLAGS g_speak_deps)
 
 execute_process (
   COMMAND ${PKG_CONFIG_EXECUTABLE} ${g_speak_deps} --cflags
@@ -63,3 +60,4 @@ execute_process (
   OUTPUT_VARIABLE g_speak_deps_libs
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+endmacro (SET_GSPEAK_FLAGS)
