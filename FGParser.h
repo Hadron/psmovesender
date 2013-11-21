@@ -181,7 +181,7 @@ template <typename OutputIterator> void CameraGroup::Intersections (K::Ray_3 ray
 
       const Camera::Viewport &v = id->camera->viewport;
       double nx = v.x + (loc.first * v.width);
-      double ny = v.y + (loc.second * v.height);
+      double ny = v.y + ((1.0 - loc.second) * v.height);
       
       Intersection s (id->camera, point, nx, ny);
       *dest++ = s;
