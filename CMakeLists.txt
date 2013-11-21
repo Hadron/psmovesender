@@ -44,7 +44,7 @@ add_executable (psmove-mouse
   psmove-mouse.1
 )
 manpage(psmove-mouse "emulate USB HID mouse/tablet with PlayStation Move")
-target_link_libraries (psmove-mouse psmoveapi psmoveapi_tracker CGAL boost_system)
+target_link_libraries (psmove-mouse psmoveapi psmoveapi_tracker CGAL boost_system hidapi-hidraw)
 install (TARGETS psmove-mouse RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if (G_SPEAK_HOME)
@@ -64,7 +64,7 @@ add_executable (psmove-gspeak
   psmove-gspeak.1
 )
 manpage(psmove-gspeak "emulate g-speak wand with PlayStation Move")
-target_link_libraries (psmove-gspeak psmoveapi psmoveapi_tracker CGAL boost_system)
+target_link_libraries (psmove-gspeak psmoveapi psmoveapi_tracker CGAL boost_system hidapi-hidraw)
 target_link_libraries (psmove-gspeak ${g_speak_deps_libs})
 install (TARGETS psmove-gspeak RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
