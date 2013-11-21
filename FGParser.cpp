@@ -173,8 +173,6 @@ void CameraGroup::parse (std::string fn)
     cameras.insert (std::pair <std::string, Camera>(c.name(), c));
   }
 
-  std::vector<ScreenTriangle> triangles;
-
   for (auto i = cameras.begin(); i != cameras.end(); i++) {
     Camera &c = i->second;
     c.push_facets (triangles);

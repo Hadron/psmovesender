@@ -140,6 +140,7 @@ class CameraGroup
 
   CameraGroup ();
   void parse (std::string fn);
+  std::vector<ScreenTriangle> triangles;
 
  public:
 
