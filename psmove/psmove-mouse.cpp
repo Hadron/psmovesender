@@ -9,7 +9,7 @@ int main (int argc, char *argv[])
   gengetopt_args_info args_info;
 
   if (cmdline_parser (argc, argv, &args_info) != 0)
-    exit (EXIT_FAILURE) ;
+    exit (EXIT_FAILURE);
 
   CameraGroup cg = ::parse (args_info.cavelayout_arg);
 
