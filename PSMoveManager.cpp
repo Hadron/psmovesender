@@ -114,7 +114,7 @@ void PSMoveManager::ConnectAll ()
     record.id = AvailableID ();
     PSMove *move = psmove_connect_internal (cur->serial_number, cur->path, record.id);
     if (move == NULL) { abort (); }
-    record.controller = new PSMoveController (move, record.id);
+    record.controller = CreateController (move, record.id);
     record.controller->Bind (this);
     record.flag = true;
 
