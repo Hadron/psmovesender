@@ -22,7 +22,7 @@ static Vect ToPlasma (const PSMoveController::Point_3 &v)
 
 static Quat ToPlasma (const PSMoveController::Quaternion &q)
 {
-  return Quat (0, 0, 0, 0);
+  return Quat (q.R_component_1(), q.R_component_2(), q.R_component_3(), q.R_component_4());
 }
 
 Slaw PSMoveWandController::ToSlaw ()
