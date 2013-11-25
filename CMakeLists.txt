@@ -15,10 +15,10 @@ include (${psmovesender_SOURCE_DIR}/bld/g-speak-sdk.cmake)
 else ()
 endif ()
 
-set (AFRL "${psmovesender_SOURCE_DIR}/..")
-
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math -std=c++0x")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${CMAKE_CURRENT_BINARY_DIR} -I${AFRL}/psmoveapi/src -I${AFRL}/psmoveapi/include -I/usr/include/hidapi")
+
+include_directories (/usr/include/hidapi)
+include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 include (GNUInstallDirs)
 

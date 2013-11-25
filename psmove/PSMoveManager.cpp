@@ -9,7 +9,13 @@
 #include <wchar.h>
 #include <stdint.h>
 
-#include "psmove_private.h"
+// #include "psmove_private.h"
+
+/* Vendor ID and Product ID of PS Move Controller */
+#define PSMOVE_VID 0x054c
+#define PSMOVE_PID 0x03d5
+
+extern "C" PSMove *psmove_connect_internal(wchar_t *serial, char *path, int id);
 
 const uint64_t INVALID_BTADDR = (uint64_t) -1;
 

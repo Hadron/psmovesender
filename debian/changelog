@@ -1,3 +1,10 @@
+psmovesender (0.2.4) unstable; urgency=low
+
+  * Allow building without psmoveapi sources (not cleanly; a clean fix
+    requires changes to psmoveapi).
+
+ -- Klee Dienes <klee@mit.edu>  Sun, 24 Nov 2013 19:36:37 -0500
+
 psmovesender (0.2.3) unstable; urgency=low
 
   * Initial release.
