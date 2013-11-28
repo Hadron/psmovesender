@@ -98,7 +98,7 @@ class PSMoveController
 
   virtual void Process ();
 
-  Quaternion GetHand ();
+  virtual Quaternion GetHand ();
   
   virtual int FileHandle ();
   virtual void NotifyChanged ();
