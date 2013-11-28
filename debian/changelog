@@ -1,3 +1,10 @@
+psmovesender (0.3.0) unstable; urgency=low
+
+  * Update copyright and license information.
+  * Replace g-speak versioning.
+
+ -- Klee Dienes <klee.dienes@hadronindustries.com>  Thu, 28 Nov 2013 12:05:56 -0500
+
 psmovesender (0.2.4) unstable; urgency=low
 
   * Allow building without psmoveapi sources (not cleanly; a clean fix
@@ -10,4 +17,3 @@ psmovesender (0.2.3) unstable; urgency=low
   * Initial release.
 
  -- Klee Dienes <klee@mit.edu>  Fri, 04 Oct 2013 13:43:18 -0400
-
