@@ -1,63 +1,36 @@
+# Copyright (c) 2012-2013 Hadron Industries, Inc.
+#
+# This is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# /* (c) 2012 Oblong Industries */
+find_package (PkgConfig)
 
-# find various yobuilds and nobuilds
-if (UNIX)
-  if (NOT APPLE)
-    set (G_SPEAK_DEPS "/opt/oblong/deps")
-  else()
-    set (G_SPEAK_DEPS "/opt/oblong/deps-64-8")
-  endif ()
-  set (CMAKE_FIND_ROOT_PATH "${CMAKE_FIND_ROOT_PATH} ${G_SPEAK_DEPS}")
-endif ()
+set (CMAKE_INSTALL_RPATH "/opt/oblong/g-speak3.11/lib")
 
-if (NOT G_SPEAK_MIN_VERSION)
-  set (G_SPEAK_MIN_VERSION "3.0")
-endif ()
-if (NOT G_SPEAK_HOME)
-  set (G_SPEAK_HOME $ENV{G_SPEAK_HOME}) # blork, $ENV isn't testable.
-endif ()
-if (NOT G_SPEAK_HOME)
-  execute_process(
-    COMMAND ${greenhouse_SOURCE_DIR}/bld/find-gspeak-sdk ${G_SPEAK_MIN_VERSION}
-    OUTPUT_VARIABLE G_SPEAK_HOME
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-endif()
-if (NOT G_SPEAK_HOME)
-  set (msg "Can't find g-speak >= ${G_SPEAK_MIN_VERSION}, please set the")
-  set (msg "${msg} G_SPEAK_HOME environment variable")
-  message (FATAL_ERROR "\n${msg}\n")
-endif ()
-
-if (EXISTS ${G_SPEAK_HOME} AND IS_DIRECTORY ${G_SPEAK_HOME})
-  message (STATUS "found g-speak: ${G_SPEAK_HOME}")
-else ()
-  set (msg "I thought I found g-speak at ${G_SPEAK_HOME}, but it's not")
-  set (msg "${msg} even a directory")
-  message (FATAL_ERROR "\n${msg}\n")
-endif ()
-
-if (APPLE)
-  set (PKG_CONFIG_EXECUTABLE ${G_SPEAK_DEPS}/bin/pkg-config)
-else ()
-  set (PKG_CONFIG_EXECUTABLE pkg-config)
-endif ()
 set (ENV{PKG_CONFIG_PATH} "${G_SPEAK_HOME}/lib/pkgconfig")
 
-macro (SET_GSPEAK_FLAGS g_speak_deps)
+macro (FIND_GSPEAK)
+  
+  foreach (lib ${ARGN})
+    
+    string (TOUPPER ${lib} var)
 
-execute_process (
-  COMMAND ${PKG_CONFIG_EXECUTABLE} ${g_speak_deps} --cflags
-  OUTPUT_VARIABLE g_speak_deps_cflags
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+    pkg_check_modules (${var} lib${lib})
+    
+    include_directories (${${var}_INCLUDE_DIRS})
+    link_directories (${${var}_LIBRARY_DIRS})
+    
+    set (G_SPEAK_LIBRARIES "${G_SPEAK_LIBRARIES};${${var}_LIBRARIES}")
 
-string (REGEX REPLACE " -pthread" "" g_speak_deps_cflags "${g_speak_deps_cflags}")
-
-execute_process (
-  COMMAND ${PKG_CONFIG_EXECUTABLE} ${g_speak_deps} --libs --static
-  OUTPUT_VARIABLE g_speak_deps_libs
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-endmacro (SET_GSPEAK_FLAGS)
+  endforeach ()
+endmacro (FIND_GSPEAK)
