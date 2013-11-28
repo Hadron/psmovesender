@@ -15,8 +15,6 @@
 
 find_package (PkgConfig)
 
-set (CMAKE_INSTALL_RPATH "/opt/oblong/g-speak3.11/lib")
-
 set (ENV{PKG_CONFIG_PATH} "${G_SPEAK_HOME}/lib/pkgconfig")
 
 macro (FIND_GSPEAK)

@@ -60,6 +60,8 @@ install (TARGETS psmove-mouse RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if (G_SPEAK_HOME)
 
+set (CMAKE_INSTALL_RPATH "/opt/oblong/g-speak3.11/lib")
+
 find_gspeak (Loam Loam++ Basement Impetus Noodoo Afferent)
 add_custom_command (
   OUTPUT gspeak-uhid-options.c gspeak-uhid-options.h

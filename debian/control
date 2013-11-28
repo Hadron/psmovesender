@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 9), autotools-dev, cmake, gengetopt, help2man
 Standards-Version: 3.9.4
 Homepage: http://www.hadronindustries.com
 
-Package: psmove-mouse
+Package: psmove-uhid
 Section: utils
 Architecture: any
 Multi-Arch: foreign
@@ -19,6 +19,7 @@ Description: PlayStation Move mouse emulator
  pointing.
 
 Package: gspeak-uhid
+Build-Profile: g-speak
 Section: contrib/utils
 Architecture: any
 Multi-Arch: foreign
@@ -30,6 +31,7 @@ Description: g-speak uhid-based mouse emulator
  XInput2.
 
 Package: psmove-gspeak
+Build-Profile: g-speak
 Section: contrib/utils
 Architecture: any
 Multi-Arch: foreign
