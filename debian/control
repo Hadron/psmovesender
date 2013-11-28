@@ -1,7 +1,7 @@
 Source: psmovesender
 Section: utils
 Priority: optional
-Maintainer: Klee Dienes <klee@mit.edu>
+Maintainer: Klee Dienes <klee.dienes@hadronindustries.com>
 Build-Depends: debhelper (>= 9), autotools-dev, cmake, gengetopt, help2man
 Standards-Version: 3.9.4
 Homepage: http://www.hadronindustries.com

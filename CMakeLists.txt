@@ -110,5 +110,5 @@ install (TARGETS psmove-gspeak RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif (G_SPEAK_HOME)
 
 set (CPACK_PACKAGE_NAME "psmovesender")
-set (CPACK_PACKAGE_CONTACT "Klee Dienes <klee@mit.edu>")
+set (CPACK_PACKAGE_CONTACT "Klee Dienes <klee.dienes@hadronindustries.com>")
 include (CPack)
