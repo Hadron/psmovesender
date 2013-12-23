@@ -60,7 +60,7 @@ ObRetort HIDPointer::OEPointingAppear (OEPointingAppearEvent *e, Atmosphere *atm
   std::string provenance (e->Provenance ().utf8 ());
   if (m_senders.count (provenance) != 0) { abort (); }
   
-  std::shared_ptr <HIDSender> s (new HIDSender (provenance));
+  std::shared_ptr <HIDSender> s (new HIDSender ("g-speak pointer " + provenance));
 
   int ret = s->Open ();
   if (ret != 0) { return ob_errno_to_retort (-ret); }
