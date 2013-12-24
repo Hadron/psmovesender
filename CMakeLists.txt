@@ -62,7 +62,7 @@ if (G_SPEAK_HOME)
 
 set (CMAKE_INSTALL_RPATH "/opt/oblong/g-speak3.11/lib")
 
-find_gspeak (Loam Loam++ Basement Impetus Noodoo Afferent)
+find_gspeak (Loam Loam++ Basement Impetus Noodoo Afferent Gestation)
 add_custom_command (
   OUTPUT gspeak-uhid-options.c gspeak-uhid-options.h
   COMMAND ${GENGETOPT_EXECUTABLE} ARGS --set-version ${DEBIAN_CHANGELOG_VERSION} -F gspeak-uhid-options --input=${CMAKE_CURRENT_SOURCE_DIR}/gspeak/gspeak-uhid.ggo
