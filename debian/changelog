@@ -1,3 +1,9 @@
+psmovesender (0.3.4) unstable; urgency=low
+
+  * Add Build-Depends on libboost-system-dev.
+
+ -- Klee Dienes <klee@mit.edu>  Thu, 26 Dec 2013 02:06:30 -0500
+
 psmovesender (0.3.3) unstable; urgency=low
 
   * Prefix g-speak pointers with "g-speak pointer "

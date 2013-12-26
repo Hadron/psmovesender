@@ -4,10 +4,11 @@ Priority: optional
 Maintainer: Klee Dienes <klee.dienes@hadronindustries.com>
 Build-Depends: debhelper (>= 9), autotools-dev, cmake, gengetopt,
  pkg-config, help2man, libcgal-dev, mesa-common-dev, libglu1-mesa-dev,
- libhidapi-dev, libpsmoveapi-dev, oblong-loam-dev, oblong-loam++-dev,
- oblong-basement-dev, oblong-impetus-dev, oblong-noodoo-dev,
- oblong-afferent-dev, oblong-plasma-dev, oblong-plasma++-dev,
- oblong-noodoo-dev, oblong-gestation-dev
+ libhidapi-dev, libpsmoveapi-dev, libboost-system-dev,
+ oblong-loam-dev, oblong-loam++-dev, oblong-basement-dev,
+ oblong-impetus-dev, oblong-noodoo-dev, oblong-afferent-dev,
+ oblong-plasma-dev, oblong-plasma++-dev, oblong-noodoo-dev,
+ oblong-gestation-dev
 Standards-Version: 3.9.4
 Homepage: http://www.hadronindustries.com
 
