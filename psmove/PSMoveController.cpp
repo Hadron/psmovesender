@@ -16,8 +16,6 @@
 
 #include "PSMoveController.h"
 
-#include <opencv2/highgui/highgui_c.h>
-
 #include <stdio.h>
 #include <poll.h>
 
