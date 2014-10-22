@@ -60,7 +60,10 @@ ObRetort HIDPointer::OEPointingAppear (OEPointingAppearEvent *e, Atmosphere *atm
   std::string provenance (e->Provenance ().utf8 ());
   if (m_senders.count (provenance) != 0) { abort (); }
   
-  std::shared_ptr <HIDSender> s (new HIDSender (provenance));
+  std::string usbname = "g-speak pointer " + provenance;
+  OB_LOG_INFO ("UHID create: %s", usbname.c_str ());
+
+  std::shared_ptr <HIDSender> s (new HIDSender (usbname));
 
   int ret = s->Open ();
   if (ret != 0) { return ob_errno_to_retort (-ret); }
